@@ -89,12 +89,14 @@ func NewSuite(ctx context.Context, t *testing.T, googleProjectID string, fields 
 	client, err := xlog.NewGCLClient(ctx, googleProjectID)
 	logger := xlog.NewLogger(client, t, fields)
 	if err != nil {
-		logger.WithError(err).Error("cloud logging not available")
+		panic(err)
+		// logger.WithError(err).Error("cloud logging not available")
 	}
 
 	progress, err := xlog.NewProgressReporter(ctx, googleProjectID, defaults.BQDataset, defaults.BQTable)
 	if err != nil {
-		logger.WithError(err).Error("cloud progress reporting not available")
+		panic(err)
+		// logger.WithError(err).Error("cloud progress reporting not available")
 	}
 
 	ctx, cancel := context.WithCancel(ctx)

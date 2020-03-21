@@ -245,21 +245,19 @@ func makeDynamicParams(baseConfig ProvisionerConfig) (*cloudDynamicParams, error
 func runTerraform(ctx context.Context, baseConfig ProvisionerConfig, logger logrus.FieldLogger) (resp *terraformResp, err error) {
 	retryer := wait.Retryer{
 		Delay:       defaults.TerraformRetryDelay,
-		Attempts:    defaults.TerraformRetries,
+		Attempts:    defaults.TerraformAttempts,
 		FieldLogger: logger,
 	}
 
-	retry := 0
+	try := 0
 	cfg := baseConfig
 	err = retryer.Do(ctx, func() error {
-		if retry != 0 {
-			cfg = baseConfig.WithTag(fmt.Sprintf("R%d", retry))
-			logger.WithFields(logrus.Fields{
-				"state-dir": cfg.StateDir,
-				"tag":       cfg.Tag(),
-			}).Info("Retrying terraform provisioning.")
-		}
-		retry++
+		cfg = baseConfig.WithTag(fmt.Sprintf("T%d", try))
+		logger.WithFields(logrus.Fields{
+			"state-dir": cfg.StateDir,
+			"tag":       cfg.Tag(),
+		}).Info("Attempting terraform provisioning.")
+		try++
 
 		params, err := makeDynamicParams(cfg)
 		if err != nil {

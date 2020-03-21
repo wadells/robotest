@@ -43,9 +43,9 @@ const (
 	// ClusterStatusTimeout specifies the maximum amount of time to wait for cluster status
 	ClusterStatusTimeout = 5 * time.Minute
 
-	// TerraformRetries is the maximum number of attempts to reprovision the
-	// infrastructure upon encountering an error from 'terraform apply'
-	TerraformRetries = 2
+	// TerraformAttempts is the maximum number of attempts to try/retry provisioning the
+	// infrastructure upon via 'terraform apply'
+	TerraformAttempts = 1
 
 	// BQDataset is the BigQuery dataset where run data is stored
 	BQDataset = "robotest"
@@ -55,10 +55,10 @@ const (
 
 	// MaxRetriesPerTest specifies the maximum number of attempts a failing
 	// test is retried (including the first failure)
-	MaxRetriesPerTest = 3
+	MaxRetriesPerTest = 1
 	// MaxPreemptedRetriesPerTest specifies the maximum number of node preemptions
 	// to tolerate before aborting the test
-	MaxPreemptedRetriesPerTest = 10
+	MaxPreemptedRetriesPerTest = 3
 
 	// TmpDir is temporary file folder
 	TmpDir = "/tmp"

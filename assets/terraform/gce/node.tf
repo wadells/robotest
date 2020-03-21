@@ -6,7 +6,7 @@ resource "google_compute_instance_group" "robotest" {
   description = "Instance group controlling instances of a single robotest cluster"
   name        = "${var.node_tag}-node-group"
   zone        = local.zone
-  network     = data.google_compute_network.robotest.self_link
+#   network     = data.google_compute_network.robotest.self_link
   instances   = google_compute_instance.node.*.self_link
 }
 
