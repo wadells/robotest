@@ -11,7 +11,6 @@ variable "credentials" {
 variable "project" {
   description = "Project to deploy to, if not set the default provider project is used."
   type        = string
-  default     = "kubeadm-167321"
 }
 
 variable "region" {
