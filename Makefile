@@ -81,12 +81,19 @@ test: ## Run unit tests.
 
 .PHONY: lint
 lint: ## Run static analysis against source code.
-lint: buildbox
+lint: license-header-lint go-lint
+
+.PHONY: go-lint
+go-lint: buildbox
 	docker run $(DOCKERFLAGS) \
 		--env="GO111MODULE=off" \
 		$(BUILDBOX) dumb-init golangci-lint run \
 		--skip-dirs=vendor \
 		--timeout=2m
+
+.PHONY: license-header-lint
+license-header-lint:
+	./check-copyright-notice.sh 2020
 
 .PHONY: version
 version: ## Show the robotest version.
