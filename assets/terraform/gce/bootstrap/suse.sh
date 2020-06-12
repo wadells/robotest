@@ -103,6 +103,19 @@ function grow-root-fs {
 
 grow-root-fs
 
+function hack-tasks-max {
+  local recommended_max=$((1024 * 1024))
+  local old_max=$(systemctl show --property DefaultTasksMax)
+  if [[ $old_max -le recommended_max ]]; then
+    local systemd_config=/etc/systemd/system.conf
+    echo "DefaultTasksMax=$recommended_max" >> $systemd_config
+    sudo systemctl daemon-reload
+    systemctl show --property DefaultTasksMax
+  fi
+}
+
+hack-tasks-max
+
 ## Setup modules / sysctls
 # Load required kernel modules
 modules="br_netfilter overlay ebtable_filter ip_tables iptable_filter iptable_nat"
