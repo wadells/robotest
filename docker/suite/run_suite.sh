@@ -15,6 +15,9 @@
 # limitations under the License.
 set -eu -o pipefail
 
+# TODO(3.0): remove this file
+echo "WARNING: use of run_suite.sh is deprecated and will be removed in Robotest 3.0" 1>&2
+
 #
 # installer could be local .tar installer or s3:// or http(s) URL
 #
