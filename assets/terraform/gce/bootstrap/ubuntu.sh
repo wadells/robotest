@@ -93,6 +93,17 @@ setup-user
 # Bump number of retries for download failures
 echo "APT::Acquire::Retries \"10\";" > /etc/apt/apt.conf.d/80-retries
 
+source /etc/os-release
+if [ "$VERSION" == "8 (jessie)" ]; then
+  # TODO (https://github.com/gravitational/robotest/issues/269): Remove this branch when robotest no
+  # longer supports Debian 8 testing. It is required because the backports mirror baked into the image
+  # no longer exists: https://lists.debian.org/debian-devel-announce/2019/03/msg00006.html
+  # Having it present will cause `apt-get update` to fail. We could get the info from
+  # archive.debian.org, but we don't need it for any of the packages.
+  # -- 2020-10 walt
+  rm -f /etc/apt/sources.list.d/backports.list
+fi
+
 apt-get update
 apt-get install -y chrony lvm2 curl wget thin-provisioning-tools python
 
