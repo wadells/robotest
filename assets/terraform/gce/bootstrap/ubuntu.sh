@@ -119,7 +119,7 @@ fi
 
 ## Setup modules / sysctls
 # Load required kernel modules
-modules="br_netfilter overlay ebtable_filter ip_tables iptable_filter iptable_nat"
+modules="br_netfilter bridge overlay ebtable_filter ip_tables iptable_filter iptable_nat"
 for module in $modules; do
   modprobe $module || true
 done
