@@ -243,7 +243,7 @@ func (g *gravity) Install(ctx context.Context, param InstallParam) error {
 
 var installCmdTemplate = template.Must(
 	template.New("gravity_install").Parse(`
-		cd {{.InstallDir}} && ./gravity version && sudo ./gravity install --debug \
+		{{.InstallDir}}/gravity version && sudo {{.InstallDir}}/gravity install --debug \
 		--advertise-addr={{.PrivateAddr}} --token={{.Token}} --flavor={{.Flavor}} \
 		{{if .DockerDevice}}--docker-device={{.DockerDevice}}{{end}} \
 		{{if .StorageDriver}}--storage-driver={{.StorageDriver}}{{end}} \
@@ -319,7 +319,7 @@ func (g *gravity) Join(ctx context.Context, param JoinCmd) error {
 
 var joinCmdTemplate = template.Must(
 	template.New("gravity_join").Parse(`
-		cd {{.InstallDir}} && sudo ./gravity join {{.PeerAddr}} \
+		sudo {{.InstallDir}}/gravity join {{.PeerAddr}} \
 		--advertise-addr={{.PrivateAddr}} --token={{.Token}} --debug \
 		--role={{.Role}} --docker-device={{.DockerDevice}} \
 		--system-log-file={{.AgentLogPath}} --state-dir={{.StateDir}} \
@@ -350,7 +350,7 @@ func (g *gravity) Remove(ctx context.Context, node string, graceful Graceful) er
 
 // Uninstall removes gravity installation. It requires Leave beforehand
 func (g *gravity) Uninstall(ctx context.Context) error {
-	cmd := fmt.Sprintf(`cd %s && sudo ./gravity system uninstall --confirm --system-log-file=%v`,
+	cmd := fmt.Sprintf(`sudo %s/gravity system uninstall --confirm --system-log-file=%v`,
 		g.installDir, defaults.AgentLogPath)
 	err := sshutils.Run(ctx, g.Client(), g.Logger(), cmd, nil)
 	return trace.Wrap(err, cmd)
@@ -360,7 +360,7 @@ func (g *gravity) Uninstall(ctx context.Context) error {
 // This is usually required to properly clean up cloud resources
 // internally managed by kubernetes in case of kubernetes cloud integration
 func (g *gravity) UninstallApp(ctx context.Context) error {
-	cmd := fmt.Sprintf("cd %s && sudo ./gravity app uninstall $(./gravity app-package) --system-log-file=%v",
+	cmd := fmt.Sprintf("sudo %s/gravity app uninstall $(./gravity app-package) --system-log-file=%v",
 		g.installDir, defaults.AgentLogPath)
 	err := sshutils.Run(ctx, g.Client(), g.Logger(), cmd, nil)
 	return trace.Wrap(err, cmd)
@@ -424,7 +424,7 @@ func (g *gravity) CollectLogs(ctx context.Context, prefix string, args ...string
 	localPath = filepath.Join(g.param.StateDir, "node-logs", prefix,
 		fmt.Sprintf("%v-logs.tgz", g.Node().PrivateAddr()))
 	return localPath, trace.Wrap(sshutils.PipeCommand(ctx, g.Client(), g.Logger(),
-		fmt.Sprintf("cd %v && sudo ./gravity system report %v", g.installDir,
+		fmt.Sprintf("sudo %s/gravity system report %v", g.installDir,
 			strings.Join(args, " ")), localPath))
 }
 
@@ -493,7 +493,7 @@ func (g *gravity) ExecScript(ctx context.Context, scriptUrl string, args []strin
 
 // Upload uploads packages in current installer dir to cluster
 func (g *gravity) Upload(ctx context.Context) error {
-	err := sshutils.Run(ctx, g.Client(), g.Logger(), fmt.Sprintf(`cd %s && sudo ./upload`, g.installDir), nil)
+	err := sshutils.Run(ctx, g.Client(), g.Logger(), fmt.Sprintf(`sudo %s/upload`, g.installDir), nil)
 	return trace.Wrap(err)
 }
 
@@ -519,7 +519,7 @@ const (
 // runOp launches specific command and waits for operation to complete, ignoring transient errors
 func (g *gravity) runOp(ctx context.Context, command string, env map[string]string) error {
 	var code string
-	sudoGravity := fmt.Sprintf(`cd %v && sudo -E ./gravity`, g.installDir)
+	sudoGravity := fmt.Sprintf(`sudo -E %s/gravity`, g.installDir)
 	logPath := filepath.Join(g.installDir, defaults.AgentLogPath)
 	err := sshutils.RunAndParse(ctx, g.Client(), g.Logger(),
 		fmt.Sprintf(`%v %v --insecure --quiet --system-log-file=%v`, sudoGravity, command, logPath),
@@ -559,7 +559,7 @@ func (g *gravity) runOp(ctx context.Context, command string, env map[string]stri
 
 // RunInPlanet executes given command inside Planet container
 func (g *gravity) RunInPlanet(ctx context.Context, cmd string, args ...string) (string, error) {
-	c := fmt.Sprintf(`cd %s && sudo ./gravity enter -- --notty %s -- %s`,
+	c := fmt.Sprintf(`sudo %s/gravity enter -- --notty %s -- %s`,
 		g.installDir, cmd, strings.Join(args, " "))
 
 	var out string
